@@ -1,0 +1,650 @@
+﻿ <Window x:Class="SteaMUlti.Views.Main"
+		 x:Name="MainWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+		xmlns:ucon="clr-namespace:SteaMultiUserControls;assembly=SteaMultiUserControls"
+		xmlns:conv="clr-namespace:SteaMUlti.Converters"
+		xmlns:cmd="clr-namespace:SteaMUlti.Commands"
+		xmlns:atchprop="clr-namespace:SteaMUlti.Attached_Properties"
+		Title="SteaMulti" Height="931" Width="484" WindowStyle="None" BorderBrush="{StaticResource MainBorder}" 
+		Background="{StaticResource MainBackground}" Foreground="White" BorderThickness="1" ResizeMode="CanMinimize"
+		MouseLeftButtonDown="DragWindow">
+
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ WINDOW RESOURCE @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@Height="931" Width="484"-->
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	
+	<Window.Resources>
+		
+		<conv:UsernameVisibilityConverter x:Key="usernameVisibilityConverter"/>
+		<conv:PasswordVisibilityConverter x:Key="passwordVisibilityConverter"/>
+		<conv:UsernameTextBlockConverter x:Key="usernameTextBlockConverter"/>
+		<conv:PasswordTextBlockConverter x:Key="passwordTextBlockConverter"/>
+		<conv:MinutesToHoursConverter x:Key="minutesToHoursConverter"/>
+		<conv:BoolToVisibilityConverter x:Key="boolToVisibilityConverter"/>
+		<conv:AccountIdToNameConverter x:Key="accountIdToNameConverter"/>
+		<conv:AccountIdToImagePathConverter x:Key="accountIdToImagePathConverter"/>
+		<conv:HideDuplicatesLabelConverter x:Key="hideDuplicatesLabelConverter"/>
+		
+		
+		
+		<!--<local:Accountss x:Key="AccountsData"/>-->
+		
+		<CollectionViewSource Source="{Binding Games}" x:Key="AllGamesCollection">
+			<CollectionViewSource.SortDescriptions>
+				<scm:SortDescription PropertyName="Name" Direction="Descending"/>
+			</CollectionViewSource.SortDescriptions>
+		</CollectionViewSource>
+		
+		<DataTemplate x:Key="FullSizeAccount">
+			<Grid Height="120" ClipToBounds="True">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="150" />
+					<ColumnDefinition Width="240" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition />
+				</Grid.RowDefinitions>
+
+				<Image x:Name="accountImage" Height="92" Source="{Binding Path=ImagePath}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+				<Border BorderThickness="1" BorderBrush="#FF555555" Grid.ColumnSpan="2" Background="Black" Opacity="0.4"
+						VerticalAlignment="Top" HorizontalAlignment="Right" Height="40" Width="120" Margin="0 -33 -33 0"
+						Visibility="{Binding Path=MainAccount, Converter={StaticResource boolToVisibilityConverter}}">
+					<TextBlock Text="MAIN" HorizontalAlignment="Center" FontSize="12" FontWeight="Bold" Foreground="Red">
+						<TextBlock.Effect>
+							<DropShadowEffect ShadowDepth="0"
+										  Color="Red"
+										  Opacity="0.8"
+										  BlurRadius="1"/>
+						</TextBlock.Effect>
+					</TextBlock>
+					<Border.LayoutTransform>
+						<RotateTransform Angle="45"/>
+					</Border.LayoutTransform>
+					<Border.Effect>
+						<DropShadowEffect ShadowDepth="5"
+										  Color="Black"
+										  Direction="225"
+										  Opacity="0.8"
+										  BlurRadius="12"/>
+					</Border.Effect>
+				</Border>
+
+				<StackPanel Grid.Column="1" Height="110" VerticalAlignment="Center">
+					<TextBlock Text="{Binding Path=AccountName}" Style="{StaticResource AccountsListBoxTextBlockTitle}" />
+					<StackPanel Orientation="Horizontal">
+						<TextBlock Text="Games:" Style="{StaticResource AccountsListBoxTextBlock}" />
+						<TextBlock Text="{Binding Path=GameCount}" Style="{StaticResource AccountsListBoxTextBlockGameCount}"  />
+					</StackPanel>
+					<TextBlock Text="{Binding Path=SteamStatus}" Style="{StaticResource AccountsListBoxTextBlock}" />
+					<Grid Width="240" Margin="0 10 0 0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="0.5*"/>
+							<ColumnDefinition Width="0.5*"/>
+						</Grid.ColumnDefinitions>
+						<TextBlock Text="NO USERNAME SET"
+								   Style="{StaticResource AccountsListBoxTextBlockWarning}"
+								   HorizontalAlignment="Left"
+								   Visibility="{Binding Path=UserName, Converter={StaticResource usernameVisibilityConverter}}"/>
+						<TextBlock Text="NO PASSWORD SET"
+								   Grid.Column="1"
+								   Style="{StaticResource AccountsListBoxTextBlockWarning}"
+								   HorizontalAlignment="Center"
+								   Visibility="{Binding Path=Password, Converter={StaticResource passwordVisibilityConverter}}"/>
+					</Grid>
+				</StackPanel>
+			</Grid>
+		</DataTemplate>
+
+		<DataTemplate x:Key="SmallSizeAccount">
+			<StackPanel Width="125" Height="Auto">
+				<Image Width="100" Source="{Binding Path=ImagePath}" />
+				<TextBlock Text="{Binding Path=AccountName}" Style="{StaticResource AccountsSmallListBoxTextBlockTitle}" />
+				<!--<StackPanel Orientation="Horizontal">
+							<TextBlock Text="Games:" Style="{StaticResource AccountsListBoxTextBlock}" />
+							<TextBlock Text="{Binding Path=GameCount}" Style="{StaticResource AccountsListBoxTextBlockGameCount}"  />
+						</StackPanel>-->
+			</StackPanel>
+		</DataTemplate>
+		
+		<!--<DataTemplate x:Key="GamesListBoxItemTemplate">
+			<StackPanel Width="248"> --><!--248 292x136 original images 0.85 aspect --><!--
+				<TextBlock Text="{Binding Name}" Style="{StaticResource GamesListBoxTextBlockTitle}" Padding="0 30 0 0" />
+				<Image Height="116" Source="{Binding LogoLocalPath}" Margin="0 -64 0 0" UseLayoutRounding="True" />
+				<Border BorderBrush="Black" BorderThickness="0 1 0 0" />
+					<StackPanel Orientation="Horizontal" Margin="0 -4 0 0">
+						<TextBlock Text="{Binding Path=Playtime, Converter={StaticResource minutesToHoursConverter}}" Style="{StaticResource AccountsListBoxTextBlock}" />
+						--><!--<TextBlock Text="minutes played" Style="{StaticResource AccountsListBoxTextBlockGameCount}" />--><!--
+					</StackPanel>
+			</StackPanel>
+		</DataTemplate>-->
+		
+		<DataTemplate x:Key="GamesListBoxItemTemplate">
+			<Grid Width="390" Height="222" ClipToBounds="True"> <!--248 292x136 original images 0.85 aspect -->
+				<Grid.RowDefinitions>
+					<RowDefinition Height="182"/>
+					<RowDefinition Height="40"/>
+				</Grid.RowDefinitions>
+				
+				<TextBlock Text="{Binding Name}" Style="{StaticResource GamesListBoxTextBlockTitle}" Width="350"/>
+				<Image Width="390" Source="{Binding LogoLocalPath}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+				<Border BorderThickness="1" BorderBrush="#FF555555"
+						VerticalAlignment="Top" HorizontalAlignment="Left" Height="40" Width="140" Margin="-30 -30 0 0" Background="Black" Opacity="0.7" Grid.ColumnSpan="2"
+						Visibility="{Binding Path=IsInstalled, Converter={StaticResource boolToVisibilityConverter}}">
+					<TextBlock Text="INSTALLED" HorizontalAlignment="Center" FontSize="13" FontWeight="Bold" Foreground="Red">
+						<TextBlock.Effect>
+							<DropShadowEffect ShadowDepth="0"
+										  Color="Red"
+										  Opacity="0.8"
+										  BlurRadius="12"/>
+						</TextBlock.Effect>
+					</TextBlock>
+					<Border.LayoutTransform>
+						<RotateTransform Angle="-45"/>
+					</Border.LayoutTransform>
+					<Border.Effect>
+						<DropShadowEffect ShadowDepth="5"
+										  Color="Black"
+										  Direction="225"
+										  Opacity="0.8"
+										  BlurRadius="12"/>
+					</Border.Effect>
+				</Border>
+				
+				<Border BorderBrush="Black" BorderThickness="0 1 0 0" Grid.Row="1" Background="#FFe1b21e">
+					<TextBlock Text="{Binding Path=Playtime, Converter={StaticResource minutesToHoursConverter}}" 
+							   Foreground="Black" FontSize="13" FontFamily="Iceberg"
+							   Margin="0 0 20 0" HorizontalAlignment="Right"/>
+				</Border>
+			</Grid>
+		</DataTemplate>
+		
+		<DataTemplate x:Key="AllGamesListBoxItemTemplate">
+			<Grid Width="390" Height="222" ClipToBounds="True"> <!--248 292x136 original images 0.85 aspect Visibility="{Binding Path=Duplicate, Converter={StaticResource boolToVisibilityConverter}, ConverterParameter={StaticResource TRUE}}"-->
+				<Grid.RowDefinitions>
+					<RowDefinition Height="182"/>
+					<RowDefinition Height="40"/>
+				</Grid.RowDefinitions>
+				
+				<TextBlock Text="{Binding Name}" Style="{StaticResource GamesListBoxTextBlockTitle}" Width="350"/>
+				<Image Width="390" Source="{Binding LogoLocalPath}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+				<Border BorderThickness="1" BorderBrush="#FF555555"
+						VerticalAlignment="Top" HorizontalAlignment="Left" Height="40" Width="140" Margin="-30 -30 0 0" Background="Black" Opacity="0.7" Grid.ColumnSpan="2"
+						Visibility="{Binding Path=IsInstalled, Converter={StaticResource boolToVisibilityConverter}}">
+					<TextBlock Text="INSTALLED" HorizontalAlignment="Center" FontSize="13" FontWeight="Bold" Foreground="Red">
+						<TextBlock.Effect>
+							<DropShadowEffect ShadowDepth="0"
+										  Color="Red"
+										  Opacity="0.8"
+										  BlurRadius="12"/>
+						</TextBlock.Effect>
+					</TextBlock>
+					<Border.LayoutTransform>
+						<RotateTransform Angle="-45"/>
+					</Border.LayoutTransform>
+					<Border.Effect>
+						<DropShadowEffect ShadowDepth="5"
+										  Color="Black"
+										  Direction="225"
+										  Opacity="0.8"
+										  BlurRadius="12"/>
+					</Border.Effect>
+				</Border>
+				
+				<Border BorderBrush="Black" BorderThickness="0 1 0 0" Grid.Row="1" Background="#FFe1b21e">
+					<DockPanel>
+						<Image Height="40" HorizontalAlignment="Left" VerticalAlignment="Center">
+							<Image.Source>
+								<MultiBinding Converter="{StaticResource accountIdToImagePathConverter}">
+									<MultiBinding.Bindings>
+										<Binding Path="AccountId"/>
+										<Binding ElementName="MainWindow" Path="DataContext"/>
+									</MultiBinding.Bindings>
+								</MultiBinding>
+							</Image.Source>
+						</Image>
+						<TextBlock Foreground="Black" FontSize="13" FontFamily="Iceberg" Margin="10 0 0 0">
+							<TextBlock.Text>
+								<MultiBinding Converter="{StaticResource accountIdToNameConverter}">
+									<MultiBinding.Bindings>
+										<Binding Path="AccountId"/>
+										<Binding ElementName="MainWindow" Path="DataContext"/>
+									</MultiBinding.Bindings>
+								</MultiBinding>
+							</TextBlock.Text>
+						</TextBlock>
+						<!--<Image Source="{Binding Path=AccountId, Converter={StaticResource accountIdToImagePathConverter}, ConverterParameter={StaticResource dupa}}"
+							   Height="40" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+						<TextBlock Text="{Binding Path=AccountId, Converter={StaticResource accountIdToNameConverter}, ConverterParameter={StaticResource dupa}}" 
+								   Foreground="Black" FontSize="13" FontFamily="Iceberg" Margin="10 0 0 0"/>-->
+						<TextBlock Text="{Binding Path=Playtime, Converter={StaticResource minutesToHoursConverter}}" 
+								   HorizontalAlignment="Right" Foreground="Black" FontSize="13" FontFamily="Iceberg" Margin="0 0 20 0"/>
+					</DockPanel>
+
+				</Border>
+			</Grid>
+		</DataTemplate>
+
+	</Window.Resources>
+	
+	
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ ROOT PANEL @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	
+<DockPanel> <!--Height="931" Width="450"-->
+
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ TOP BAR @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	
+	<!--<DockPanel DockPanel.Dock="Top" Height="35" MouseLeftButtonDown="DragWindow" Background="Transparent" Cursor="SizeAll">
+		
+		<ucon:SteamLogo Color="White" height="26" Margin="10 3 10 3"/>
+		<TextBlock Text="steamulti" FontFamily="Source Code Pro" FontSize="16" />
+		
+	</DockPanel> --><!-- END OF TOP BAR -->
+	
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ BOTTOM BAR @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	
+	<!--<Border BorderBrush="{StaticResource Splitter}" BorderThickness="0 1 0 0" DockPanel.Dock="Bottom">
+	<DockPanel  Height="35" Background="Transparent">
+		
+		
+		--><!--<Button Command="{Binding EditModeCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Right">
+			<ucon:Wrench x:Name="EditModeButtonText" Color="{StaticResource ControlsBrush}" Text="EDIT MODE OFF"/>
+		</Button>--><!--
+		<ucon:LoadingGear x:Name="LoadingBottomBar" Height="24" Text="Loading..." Margin="6,0,0,0"
+						  GearFillColor="#22ffffff" TextColor="#22ffffff" TextFontSize="10"
+						  Visibility="Collapsed"/>
+		
+	</DockPanel> --><!-- END OF BOTTOM BAR --><!--
+	</Border>-->
+	
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ LEFT BAR @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	
+	<Border BorderBrush="{StaticResource Splitter}" BorderThickness="0 0 1 0" DockPanel.Dock="Left" Width="50">
+	<DockPanel Width="50" LastChildFill="False">
+		<Button Command="{Binding CloseAppCommand}" Style="{StaticResource ImageButton}" DockPanel.Dock="Top" Margin="0 10 0 0">
+			<ucon:Close Color="{StaticResource ControlsBrush}" ControlWidth="40" ControlHeight="40"  width="16"/>
+		</Button>
+		<Button Command="{Binding MinimizeAppCommand}" Style="{StaticResource ImageButton}" DockPanel.Dock="Top">
+			<ucon:Minimize Color="{StaticResource ControlsBrush}" ControlWidth="40" ControlHeight="40" width="16"/>
+		</Button>
+		
+		<Border BorderBrush="{StaticResource Splitter}" BorderThickness="0 1 0 0" Width="40" Margin="0 20 0 10"
+				HorizontalAlignment="Center" DockPanel.Dock="Top"/>
+		
+		<Button Command="{Binding ShowAccountsCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:Accounts width="44" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding ShowGamesCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:Gamepad width="44" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding ShowAllGamesCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:GamepadAll width="44" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding LunchSteamCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:LunchSteam width="44" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding LunchSteamAppCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:LunchSteamApp width="44" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		
+		<Border BorderBrush="{StaticResource Splitter}" BorderThickness="0 1 0 0" Width="40" Margin="0 20 0 10"
+				HorizontalAlignment="Center" DockPanel.Dock="Top"/>
+		
+		<Button Command="{Binding AddCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:Add width="32" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding DeleteAccountCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:Delete width="32" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding EditCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:Edit width="32" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding MoveUpCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:MoveUp width="32" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		<Button Command="{Binding MoveDownCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Top">
+			<ucon:MoveDown width="32" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+		
+		<Button Command="{Binding SettingsCommand}" Style="{StaticResource UserControlButton}" DockPanel.Dock="Bottom">
+			<ucon:Settingss width="32" Color="{StaticResource ControlsBrush}"/>
+		</Button>
+	</DockPanel>
+	</Border>
+	
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ CONTROLS PANEL @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+		
+	<StackPanel DockPanel.Dock="Bottom" Margin="10" Visibility="Collapsed">
+			
+		<!--<Border x:Name="SplitterBorder" BorderBrush="{StaticResource Splitter}" BorderThickness="0 1 0 0" />-->
+			
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ EDIT MODE CONTROLS @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<StackPanel x:Name="EditModeControls" Visibility="Collapsed">
+        </StackPanel>
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ OK CANCEL CONTROLS @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ DELETE CONTROLS @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<StackPanel x:Name="DeleteControls" Visibility="Collapsed" DockPanel.Dock="Bottom" Margin="10">
+			<TextBlock Text="Do you want to delete this account?" Margin="10 5" HorizontalAlignment="Left" />
+			<Button Name="YESButton"  Content="YES" Command="{Binding DetailsOKCommand}" CommandParameter="{Binding Content, ElementName=YESButton}" />
+			<Button Name="NOButton" Content="NO" Command="{Binding DetailsCancelCommand}" CommandParameter="{Binding Content, ElementName=NOButton}" />
+		</StackPanel>
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ ACCOUNTS LIST CONTROLS @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ PROGRESS PANEL @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<StackPanel x:Name="ProgressPanel" Visibility="Collapsed">
+			<TextBlock x:Name="ProgressText" Style="{StaticResource AccountsListBoxTextBlock}" />
+		</StackPanel>
+
+	</StackPanel> <!-- END OF CONTROLS PANEL -->
+
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ CONTENT PANELS @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	<!--@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@-->
+	
+	<!--<Border BorderBrush="{StaticResource Splitter}" BorderThickness="0 1 0 0">-->
+		
+	<StackPanel x:Name="MainPanel" Orientation="Horizontal" Margin="10">
+		
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ ACCOUNTS LIST BOX @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+			<Grid Visibility="{Binding Path=panelSwitch.Accounts, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+				
+				<ListBox x:Name="AccountsListBox" IsSynchronizedWithCurrentItem="True" ItemsSource="{Binding Path=Accounts, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+					Background="{StaticResource MainBackground}" BorderBrush="{x:Null}"
+					ItemContainerStyle="{StaticResource AccountListBoxItem}" SelectionChanged="AccountsListBox_SelectionChanged"
+					ItemTemplate="{StaticResource FullSizeAccount}" 
+					ScrollViewer.VerticalScrollBarVisibility="Visible"
+					ScrollViewer.CanContentScroll="False">
+					
+					<ListBox.ContextMenu>
+						<ContextMenu x:Name="AccountListBoxContextMenu">
+							<!-- DataContext set in code behind -->
+							<MenuItem Header="EDIT" Command="{Binding EditCommand}"/>
+							<MenuItem Header="SET AS MAIN" Command="{Binding SetAsMainAccountCommand}"/>
+							<Separator/>
+							<MenuItem Header="MOVE UP" Command="{Binding MoveUpCommand}"/>
+							<MenuItem Header="MOVE DOWN" Command="{Binding MoveDownCommand}"/>
+							<Separator/>
+							<MenuItem Header="ADD" Command="{Binding AddCommand}" />
+							<MenuItem Header="DELETE" Command="{Binding DeleteAccountCommand}"/>
+						</ContextMenu>
+					</ListBox.ContextMenu>
+				</ListBox>
+			
+			</Grid>
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ GAMES LISTBOX @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<DockPanel Visibility="{Binding Path=panelSwitch.Games, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+				
+			<TextBox Margin="2 5 2 5" DockPanel.Dock="Top"
+					 atchprop:KeyUpCommandProperty.KeyUpCommand="{Binding SearchGamesCommand}"
+					 atchprop:KeyUpCommandProperty.KeyUpCommandParameter="{Binding ElementName=GamesListBox}"/>
+			
+			<ComboBox Margin="2 5 2 5" SelectedIndex="3" DockPanel.Dock="Bottom"
+						atchprop:SelectionChangedCommandProperty.SelectionChangedCommand="{Binding ChangeSortingCommand}"
+						atchprop:SelectionChangedCommandProperty.SelectionChangedCommandParameter="{Binding ElementName=GamesListBox}">
+				<ComboBoxItem Content="Alphabetically (A-Z)"/>
+				<ComboBoxItem Content="Alphabetically (Z-A)"/>
+				<ComboBoxItem Content="Playtime (0-9)"/>
+				<ComboBoxItem Content="Playtime (9-0)"/>
+				<ComboBoxItem Content="Installed"/>
+			</ComboBox>
+			
+			<ListBox x:Name="GamesListBox"
+					DataContext="{Binding Accounts}" ItemsSource="{Binding OwnedGames}"
+					ScrollViewer.VerticalScrollBarVisibility="Visible" 
+					Background="{StaticResource MainBackground}" BorderBrush="{x:Null}" 
+					ItemContainerStyle="{StaticResource AccountListBoxItem}"
+					ItemTemplate="{StaticResource GamesListBoxItemTemplate}"
+					ScrollViewer.CanContentScroll="False"/>
+			
+		</DockPanel >
+		<!--DataContext="{Binding Accounts}" ItemsSource="{Binding OwnedGames}"-->
+		<!--Visibility="{Binding Path=panelSwitch.Games, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}"-->
+			
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ ALL GAMES LISTBOX @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<DockPanel Visibility="{Binding Path=panelSwitch.AllGames, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+			
+			<TextBox x:Name="AllGamesSearchTextBox" Margin="2 5 2 5" DockPanel.Dock="Top"
+					 atchprop:KeyUpCommandProperty.KeyUpCommand="{Binding SearchGamesCommand}"
+					 atchprop:KeyUpCommandProperty.KeyUpCommandParameter="{Binding ElementName=AllGamesListBox}"/>
+			
+			<ComboBox x:Name="AllGamesSortingComboBox" Margin="2 5 2 5" SelectedIndex="0" DockPanel.Dock="Bottom"
+					  atchprop:SelectionChangedCommandProperty.SelectionChangedCommand="{Binding ChangeSortingCommand}"
+					  atchprop:SelectionChangedCommandProperty.SelectionChangedCommandParameter="{Binding ElementName=AllGamesListBox}">
+				<ComboBoxItem Content="Alphabetically (A-Z)"/>
+				<ComboBoxItem Content="Alphabetically (Z-A)"/>
+				<ComboBoxItem Content="Playtime (0-9)"/>
+				<ComboBoxItem Content="Playtime (9-0)"/>
+				<ComboBoxItem Content="Installed"/>
+			</ComboBox>
+			
+			<ListBox x:Name="AllGamesListBox"
+				ItemsSource="{Binding Games}" 
+				ScrollViewer.VerticalScrollBarVisibility="Visible" 
+				Background="{StaticResource MainBackground}" BorderBrush="{x:Null}" 
+				ItemContainerStyle="{StaticResource AccountListBoxItem}"
+				ItemTemplate="{StaticResource AllGamesListBoxItemTemplate}"
+				ScrollViewer.CanContentScroll="False"/>
+
+
+			</DockPanel>
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ EDIT @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<Grid Visibility="{Binding Path=panelSwitch.Edit, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+			<Grid x:Name="DetailsPanel" Width="410" DataContext="{Binding ElementName=AccountsListBox, Path=SelectedItem}">
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="0.4*" />
+					<ColumnDefinition Width="0.6*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="200" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="50" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="50" />
+					<RowDefinition Height="auto"/>
+				</Grid.RowDefinitions>
+
+				<Image Grid.ColumnSpan="2" Source="{Binding Path=ImagePath}" Height="184" Margin="8" />
+
+				<TextBlock Grid.Row="1" Style="{StaticResource DetailsPanelTextBlock}">Account Name</TextBlock>
+				<TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Path=AccountName}" />
+
+				<TextBlock Grid.Row="2" Style="{StaticResource DetailsPanelTextBlock}">SteamId</TextBlock>
+				<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=SteamId}" IsReadOnly="True" />
+
+				<TextBlock Grid.Row="3" Style="{StaticResource DetailsPanelTextBlock}">Steam status</TextBlock>
+				<TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Path=SteamStatus}" IsReadOnly="True" />
+
+				<Border Grid.Row="4" Grid.ColumnSpan="2" BorderThickness="0 1 0 0" BorderBrush="{StaticResource Splitter}" Margin="0 10 0 0" />
+
+				<TextBlock Grid.Row="5"
+					Text="{Binding Path=UserName, Converter={StaticResource usernameTextBlockConverter}}"
+					Style="{StaticResource DetailsPanelTextBlock}"/>
+				<TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Path=UserName}" />
+
+				<TextBlock Grid.Row="6"
+					Style="{StaticResource DetailsPanelTextBlock}"
+					Text="{Binding Path=Password, Converter={StaticResource passwordTextBlockConverter}}"/>
+				<PasswordBox Grid.Row="6" Grid.Column="1" x:Name="steamAccountPassword" />
+				
+				<Border Grid.Row="7" Grid.ColumnSpan="2" BorderThickness="0 1 0 0" BorderBrush="{StaticResource Splitter}" Margin="0 10 0 0" />
+				
+				<StackPanel x:Name="EditOkCancelPanel" Grid.Row="8" Grid.ColumnSpan="2">
+					<Button Name="OKButton" Content="OK" Command="{Binding DetailsOKCommand}" CommandParameter="EDIT" />
+					<Button Name="CancelButton" Content="CANCEL" Command="{Binding DetailsCancelCommand}" CommandParameter="EDIT"/>
+					<Button Content="SYNC WITH STEAM" Command="{Binding AddCommand}" />
+				</StackPanel>
+			</Grid>
+		</Grid>
+
+			<!--@@@@@@@@@@@@@@@@@@@@@@@@ NEW ACCOUNT PANEL @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<Grid Visibility="{Binding Path=panelSwitch.NewAccount, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+			<Grid x:Name="NewAccountPanel" Width="410" DataContext="{Binding Path=NewAccount}">
+
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="0.4*" />
+					<ColumnDefinition Width="0.6*" />
+				</Grid.ColumnDefinitions>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="240" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="50" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="40" />
+					<RowDefinition Height="50" />
+					<RowDefinition Height="auto" />
+				</Grid.RowDefinitions>
+
+				<Image Grid.ColumnSpan="2" Source="{Binding Path=ImagePath}" Height="184" />
+
+				<TextBlock Grid.Row="1" Style="{StaticResource DetailsPanelTextBlock}">Account Type</TextBlock>
+				<ComboBox Grid.Row="1" Grid.Column="1" SelectedIndex="{Binding Path=AccountType}">
+					<ComboBoxItem Content="Steam"/>
+					<ComboBoxItem Content="Origin"/>
+					<ComboBoxItem Content="UPlay"/>
+				</ComboBox>
+
+				<TextBlock Grid.Row="2" Style="{StaticResource DetailsPanelTextBlock}">Account Name</TextBlock>
+				<TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Path=AccountName}" />
+
+				<Border Grid.Row="3" Grid.ColumnSpan="2" BorderThickness="0 1 0 0" BorderBrush="{StaticResource Splitter}" Margin="0 10 0 0" />
+
+				<TextBlock Grid.Row="4" Style="{StaticResource DetailsPanelTextBlock}">Username</TextBlock>
+				<TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Path=UserName}" />
+
+				<TextBlock Grid.Row="5" Style="{StaticResource DetailsPanelTextBlock}">Password</TextBlock>
+				<PasswordBox Grid.Row="5" Grid.Column="1" x:Name="newAccountPassword"/>
+				
+				<Border Grid.Row="6" Grid.ColumnSpan="2" BorderThickness="0 1 0 0" BorderBrush="{StaticResource Splitter}" Margin="0 10 0 0" />
+				
+				<StackPanel x:Name="NewAccountOkCancelPanel" Grid.Row="7" Grid.ColumnSpan="2">
+					<Button Content="OK" Command="{Binding DetailsOKCommand}" CommandParameter="NEW" />
+					<Button Content="OK - GET INFO FROM STEAM" Command="{Binding SyncWithSteamCommand}" CommandParameter="NEW"/>
+					<Button Content="CANCEL" Command="{Binding DetailsCancelCommand}" CommandParameter="NEW"/>
+				</StackPanel>
+			</Grid>
+		</Grid>
+		
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ DELETE @@@@@@@@@@@@@@@@@@@@@@@@-->
+		
+		<Grid Visibility="{Binding Path=panelSwitch.Delete, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+			<StackPanel>
+				<Border Name="Border" BorderThickness="1" Padding="0 10 0 10" BorderBrush="Black" Background="#FF3C3B3A">
+					<Grid DataContext="{Binding ElementName=AccountsListBox, Path=SelectedItem}">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="150" />
+							<ColumnDefinition Width="240" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+						</Grid.RowDefinitions>
+
+						<Image x:Name="accountImage" Height="92" Source="{Binding Path=ImagePath}" />
+
+						<StackPanel Grid.Column="1">
+							<TextBlock Text="{Binding Path=AccountName}" Style="{StaticResource AccountsListBoxTextBlockTitle}" />
+							<StackPanel Orientation="Horizontal">
+								<TextBlock Text="Games:" Style="{StaticResource AccountsListBoxTextBlock}" />
+								<TextBlock Text="{Binding Path=GameCount}" Style="{StaticResource AccountsListBoxTextBlockGameCount}"  />
+							</StackPanel>
+							<TextBlock Text="{Binding Path=SteamStatus}" Style="{StaticResource AccountsListBoxTextBlock}" />
+							<Grid Width="240" Margin="0 10 0 0">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="0.5*"/>
+									<ColumnDefinition Width="0.5*"/>
+								</Grid.ColumnDefinitions>
+								<TextBlock Text="NO USERNAME SET"
+										   Style="{StaticResource AccountsListBoxTextBlockWarning}"
+										   HorizontalAlignment="Left"
+										   Visibility="{Binding Path=UserName, Converter={StaticResource usernameVisibilityConverter}}"/>
+								<TextBlock Text="NO PASSWORD SET"
+										   Grid.Column="1"
+										   Style="{StaticResource AccountsListBoxTextBlockWarning}"
+										   HorizontalAlignment="Center"
+										   Visibility="{Binding Path=Password, Converter={StaticResource passwordVisibilityConverter}}"/>
+							</Grid>
+						</StackPanel>
+					</Grid>
+				</Border>
+				<Border BorderThickness="0 1 0 0" BorderBrush="{StaticResource Splitter}" Margin="0 20 0 30" />
+				<TextBlock Text="Do you want to delete this account?" Margin="10 5" HorizontalAlignment="Left" />
+				<Button Content="YES" Command="{Binding DetailsOKCommand}" CommandParameter="DELETE" />
+				<Button Content="NO" Command="{Binding DetailsCancelCommand}" CommandParameter="DELETE" />
+			</StackPanel>
+		</Grid>
+
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ SETTINGS @@@@@@@@@@@@@@@@@@@@@@@@-->
+
+		<StackPanel x:Name="SettingsPanel" Margin="20"
+					Visibility="{Binding Path=panelSwitch.Settings, Converter={StaticResource boolToVisibilityConverter}, UpdateSourceTrigger=PropertyChanged}">
+			<Label Content="Please set Steam path!!!" Foreground="Red"
+				   Visibility="{Binding Path=settings.SteamPath, Converter={StaticResource usernameVisibilityConverter}}"/>
+			<StackPanel Orientation="Horizontal">
+				<TextBox Text="{Binding Path=settings.SteamPath}" Width="300"/>
+				<Button Content="Browse..." Command="{Binding BrowseSteamPathCommand}" />
+			</StackPanel>
+			
+			<Border BorderThickness="1" BorderBrush="Black" Width="370" Margin="0 20" Padding="10">
+				<StackPanel>
+					<Label Content="Level of protection" Margin="0 -25 0 0" Background="{StaticResource MainBackground}" HorizontalAlignment="Left" Width="auto"/>
+					<RadioButton GroupName="protectionLevel" Margin="20 10 0 10" IsChecked="True">Machine based encryption (no password required)</RadioButton>
+					<RadioButton Name="aesRadioButton" GroupName="protectionLevel" Margin="20 0 0 10">AES256 (password required)</RadioButton>
+					<StackPanel x:Name="SetMasterPasswordPanel" Visibility="{Binding ElementName=aesRadioButton, Path=IsChecked, Converter={StaticResource boolToVisibilityConverter}}">
+						<PasswordBox x:Name="masterPassword" Width="200" Margin="20 0 0 10"/>
+						<Button Content="Set New Master Password" Margin="20 0 0 10" Command="{Binding SetMasterPasswordCommand}" />
+					</StackPanel>
+				</StackPanel>
+			</Border>
+
+			<Grid>
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="0.5*"/>
+					<ColumnDefinition Width="0.5*"/>
+				</Grid.ColumnDefinitions>
+				<Button Content="SEARCH FOR DUPLICATES" Command="{Binding SearchForDuplicatesCommand}"/>
+				<Button Content="{Binding Path=settings.HideDuplicates, Converter={StaticResource hideDuplicatesLabelConverter}}" Command="{Binding HideDuplicatesCommand}" Grid.Column="1"/>
+			</Grid>
+
+			<Button Content="Reset database" Command="{Binding ResetDatabaseCommand}" />
+			
+			<Button Content="Add accounts from Steam path" Command="{Binding AddAccountsAutoCommand}" />
+
+		</StackPanel>
+		
+		<!--@@@@@@@@@@@@@@@@@@@@@@@@ LOADING PANEL @@@@@@@@@@@@@@@@@@@@@@@@-->
+		
+		<StackPanel x:Name="LoadingPanel" Visibility="Collapsed" Margin="20" Orientation="Horizontal">
+			<ucon:LoadingGear x:Name="LoadingText" Height="40" Text="Loading..." />
+		</StackPanel>
+		
+	</StackPanel> <!-- END OF LIST BOX PANEL -->
+	<!--</Border>-->
+	
+</DockPanel>
+
+</Window>

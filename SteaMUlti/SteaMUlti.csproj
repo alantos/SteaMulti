@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{36816F07-1624-4FC7-A9B3-D39859B162A3}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>SteaMUlti</RootNamespace>
+    <AssemblyName>SteaMUlti</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="protobuf-net">
+      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="SteaMultiUserControls">
+      <HintPath>..\..\SteaMultiUserControls\SteaMultiUserControls\bin\Debug\SteaMultiUserControls.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Attached Properties\KeyUpCommandProperty.cs" />
+    <Compile Include="Attached Properties\SelectionChangedCommandProperty.cs" />
+    <Compile Include="Commands\ChooseNewAccountTypeCommand.cs" />
+    <Compile Include="Commands\SyncWithSteamCommand.cs" />
+    <Compile Include="Commands\LunchSteamAppCommand.cs" />
+    <Compile Include="Commands\MoveDownCommand.cs" />
+    <Compile Include="Commands\MoveUpCommand.cs" />
+    <Compile Include="Commands\AddAccountCommand.cs" />
+    <Compile Include="Commands\CloseAppCommand.cs" />
+    <Compile Include="Commands\AddAccountsAutoCommand.cs" />
+    <Compile Include="Commands\ResetDatabaseCommand.cs" />
+    <Compile Include="Commands\SetMasterPasswordCommand.cs" />
+    <Compile Include="Commands\ShowAllGamesCommand.cs" />
+    <Compile Include="Commands\ChangeSortingCommand.cs" />
+    <Compile Include="Commands\SearchGamesCommand.cs" />
+    <Compile Include="Commands\SetAsMainAccountCommand.cs" />
+    <Compile Include="Commands\HideDuplicatesCommand.cs" />
+    <Compile Include="Commands\SearchForDuplicatesCommand.cs" />
+    <Compile Include="Commands\ShowGamesCommand.cs" />
+    <Compile Include="Commands\ShowAccountsCommand.cs" />
+    <Compile Include="Commands\SettingsCommand.cs" />
+    <Compile Include="Commands\BrowseSteamPathCommand.cs" />
+    <Compile Include="Commands\DeleteAccountCommand.cs" />
+    <Compile Include="Commands\EditAccountCommand.cs" />
+    <Compile Include="Commands\DetailsCancelCommand.cs" />
+    <Compile Include="Commands\DetailsOKCommand.cs" />
+    <Compile Include="Commands\LunchSteamCommand.cs" />
+    <Compile Include="Commands\MinimizeAppCommand.cs" />
+    <Compile Include="Converters\AccountIdToImagePathConverter.cs" />
+    <Compile Include="Converters\AccountIdToNameConverter.cs" />
+    <Compile Include="Converters\HideDuplicatesLabelConverter.cs" />
+    <Compile Include="Converters\PasswordTextBlockConverter.cs" />
+    <Compile Include="Converters\UsernameTextBlockConverter.cs" />
+    <Compile Include="Converters\PasswordVisibilityConverter.cs" />
+    <Compile Include="Converters\MinutesToHoursConverter.cs" />
+    <Compile Include="Converters\BoolToVisibilityConverter.cs" />
+    <Compile Include="Converters\ViewModelLocatorConverter.cs" />
+    <Compile Include="Converters\UsernameVisibilityConverter.cs" />
+    <Compile Include="Models\Crypto.cs" />
+    <Compile Include="Models\MainModel.AccountClass.cs" />
+    <Compile Include="Models\Settings.cs" />
+    <Compile Include="Models\SteamAPI.cs" />
+    <Compile Include="ViewModels\AccountViewModel.Functions.cs" />
+    <Compile Include="ViewModels\AccountViewModel.Panel.cs" />
+    <Compile Include="ViewModels\AccountViewModel.Constructor.cs" />
+    <Compile Include="ViewModels\AccountViewModel.Properties.cs" />
+    <Compile Include="ViewModels\AccountViewModel.Commands.cs" />
+    <Compile Include="ViewModels\BaseViewModel.cs" />
+    <Compile Include="Views\Main.xaml.cs">
+      <DependentUpon>Main.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\MainModel.Database.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\steamX.png" />
+    <Resource Include="Resources\Images\steam_.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="Styles\ContextMenu.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Main.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\steam_logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\Accounts\id_0.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\noImage.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\settings.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\edit_mode.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\gear_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\edit_mode_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\settings_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Images\edit_mode_white_30.png" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
